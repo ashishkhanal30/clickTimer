@@ -1,0 +1,101 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Numbered Bubbles</title>
+<style>
+  .bubble {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #ccc;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    margin: 5px;
+    cursor: pointer;
+  }
+  .bubble.clicked {
+    background-color: orange;
+  }
+  #instruction{
+    background-color: orange;
+     text-align: center;
+    margin: 5px;
+    
+    
+  }
+</style>
+</head>
+<body>
+  <p id="instruction">Timer starts once the first bubble is clicked</p>
+<div id="bubblesContainer"></div>
+<div id="timer"></div>
+<button id="clearButton">Clear</button>
+<script>
+  var bubblesContainer = document.getElementById('bubblesContainer');
+  var timerDisplay = document.getElementById('timer');
+  var clearButton = document.getElementById('clearButton');
+  var startTime;
+  var timerInterval;
+
+  function createBubbles(numBubbles) {
+    for (var i = 1; i <= numBubbles; i++) {
+      var bubble = document.createElement('div');
+      bubble.textContent = i;
+      bubble.className = 'bubble';
+      bubble.setAttribute('data-index', i);
+      bubble.addEventListener('click', bubbleClickHandler);
+      bubblesContainer.appendChild(bubble);
+    }
+  }
+
+  function bubbleClickHandler(event) {
+    var clickedBubble = event.target;
+    clickedBubble.classList.add('clicked');
+    if (clickedBubble.getAttribute('data-index') == 1 && !startTime) {
+      startTime = new Date().getTime();
+      timerInterval = setInterval(updateTimer, 1000);
+    }
+    checkAllBubblesClicked();
+  }
+
+  function checkAllBubblesClicked() {
+    var bubbles = document.querySelectorAll('.bubble');
+    for (var i = 0; i < bubbles.length; i++) {
+      if (!bubbles[i].classList.contains('clicked')) {
+        return;
+      }
+    }
+    clearInterval(timerInterval);
+    alert('All bubbles clicked!');
+  }
+
+  function updateTimer() {
+    var currentTime = new Date().getTime();
+    var elapsedTime = Math.floor((currentTime - startTime) / 1000);
+    timerDisplay.textContent = 'Time: ' + formatTime(elapsedTime);
+  }
+
+  function formatTime(seconds) {
+    var minutes = Math.floor(seconds / 60);
+    var remainingSeconds = seconds % 60;
+    return minutes.toString().padStart(2, '0') + ':' + remainingSeconds.toString().padStart(2, '0');
+  }
+
+  function clearAll() {
+    var bubbles = document.querySelectorAll('.bubble');
+    for (var i = 0; i < bubbles.length; i++) {
+      bubbles[i].classList.remove('clicked');
+    }
+    clearInterval(timerInterval);
+    timerDisplay.textContent = '';
+    startTime = null;
+  }
+
+  createBubbles(100);
+  clearButton.addEventListener('click', clearAll);
+</script>
+</body>
+</html>
